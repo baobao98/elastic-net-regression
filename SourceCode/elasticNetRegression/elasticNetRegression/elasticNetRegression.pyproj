@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>5c038eca-1c87-4b48-bc57-222d0473d916</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>plot_lasso_and_elasticnet.py</StartupFile>
+    <StartupFile>elasticNetRegression.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,6 +23,9 @@
   <ItemGroup>
     <Compile Include="elasticNetRegression.py" />
     <Compile Include="plot_lasso_and_elasticnet.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dataset\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
