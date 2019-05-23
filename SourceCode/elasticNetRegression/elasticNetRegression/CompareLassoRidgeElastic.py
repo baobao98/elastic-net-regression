@@ -54,12 +54,10 @@ def linear_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     lm.fit(X_train_scaled, y_train)
     y_pred_train = lm.predict(X_train_scaled)
     y_pred_test = lm.predict(X_test_scaled)
-    #global metrics_lr lưu giữ ở đây cho lần so sánh kế tiếp 
-    global metrics_lr 
     metrics_lr = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
-    return scores_results(y_train, y_test, y_pred_train, y_pred_test)
-
+    return metrics_lr
 #======================Regularization============================
+#Elastic Net Regression
 def elastic_net_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     from sklearn.linear_model import ElasticNetCV
     #n_alphas (int) số lượng số alphas trong quá trình regularization, được sử dụng cho mỗi l1_ratio
@@ -74,6 +72,7 @@ def elastic_net_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     metrics_en = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
     return metrics_en
 
+#Lasso Regression
 def lasso_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     from sklearn.linear_model import LassoCV
     n_alphas = 5000
@@ -85,6 +84,7 @@ def lasso_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     metrics_lasso = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
     return metrics_lasso
 
+#Ridge Regression
 def ridge_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     from sklearn.linear_model import RidgeCV
     n_alphas = 100
@@ -98,7 +98,9 @@ def ridge_reg(X_train_scaled, X_test_scaled, y_train, y_test):
 
 metrics_lasso = lasso_reg(X_train_scaled, X_test_scaled, y_train, y_test)
 metrics_en = elastic_net_reg(X_train_scaled, X_test_scaled, y_train, y_test)
+metrics_lr = linear_reg(X_train_scaled, X_test_scaled, y_train, y_test)
 metrics_ridge = ridge_reg(X_train_scaled, X_test_scaled, y_train, y_test)
-finalscores = pd.DataFrame(list(zip(metrics_lr, metrics_lasso, metrics_en, metrics_ridge)), columns = ['lr', 'lasso', 'el net', 'ridge'], index = ['acc','mse','r2'])
-print("Linear regression (lr) | Lasso (L1) | Ridge (L2) | Elastic Net (L1 and L2)")
+finalscores = pd.DataFrame(list(zip(metrics_lr, metrics_lasso, metrics_en, metrics_ridge)), columns = ['linear R', 'Lasso', 'Elastic N', 'Ridge'], index = ['acc','mse','r2'])
+print("Linear regression (lr) | Lasso (L1) | Elastic Net (L1 and L2) | Ridge (L2)")
 print(finalscores)
+

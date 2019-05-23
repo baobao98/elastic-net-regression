@@ -21,11 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DemoElasticNetRegression.py" />
     <Compile Include="ElasticNetRegression.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="nhap.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CompareLassoRidgeElastic.py">
