@@ -28,7 +28,6 @@
     <Compile Include="nhap.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="plot_lasso_and_elasticnet.py" />
     <Compile Include="CompareLassoRidgeElastic.py">
       <SubType>Code</SubType>
     </Compile>
