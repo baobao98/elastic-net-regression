@@ -10,45 +10,43 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 
+
 #Initial dataset observations
 df = pd.read_csv('Dataset/winequality-red.csv')
-#print(df.head())
-#df.info()
-
-#def plot_wine_quality_histogram(quality):
-#    unique_vals = df['quality'].sort_values().unique()
-#    plt.xlabel("Quality")
-#    plt.ylabel("Count")
-#    plt.hist(quality.values, bins=np.append(unique_vals, 9), align='left')
-#    plt.show()
-#plot_wine_quality_histogram(df['quality'])
-
 
 #Data preprocessing
-#We first split our data into training (80%) and test (20%) sets.
+
+#y: label ( cột quality )
 y = df.quality
+#X: dataset bỏ cột quality
 X = df.drop('quality', axis=1)
 
+#We first split our data into training (80%) and test (20%) sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0, stratify=y)
 
+#scale dữ liệu train nằm trong khoảng [-1;1]
 scaler = preprocessing.StandardScaler().fit(X_train)
 X_train_scaled = scaler.transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 
-#======Initial approaches: Regression
+#======Initial approaches: Regression===================
 
 #--Create metrics
-#def scores_results(y_train, y_test, y_pred_train, y_pred_test):
-#    #this function will provide us with accuracy and mse scores for training and test sets
-#    y_pred_train_round = np.round(y_pred_train)
-#    y_pred_test_round = np.round(y_pred_test)
-#    accuracy = [accuracy_score(y_train, y_pred_train_round), accuracy_score(y_test, y_pred_test_round)]
-#    mse_with_rounding = [mean_squared_error(y_train, y_pred_train_round), mean_squared_error(y_test, y_pred_test_round)]
-#    results = pd.DataFrame(list(zip(accuracy, mse_with_rounding)), columns = ['accuracy score', 'mse (after rounding)'], index = ['train', 'test'])
-#    return results
+#các phương thức đánh giá dựa trên việc so sách giữa kết quả dự đoán(y_pred) từ chính dataset đã train (x_train) và dataset tách ra trước khi train ( x_test)
+#scores_results đánh giá giữa label có sẵn (train và test) và kết quả dự đoán (train và test) 
+def scores_results(y_train, y_test, y_pred_train, y_pred_test):
+    #this function will provide us with accuracy and mse scores for training and test sets
+    #lưu ý: sai số toàn phương trung bình, viết tắt MSE (Mean squared error) 
+    y_pred_train_round = np.round(y_pred_train)
+    y_pred_test_round = np.round(y_pred_test)
+    accuracy = [accuracy_score(y_train, y_pred_train_round), accuracy_score(y_test, y_pred_test_round)]
+    mse_with_rounding = [mean_squared_error(y_train, y_pred_train_round), mean_squared_error(y_test, y_pred_test_round)]
+    results = pd.DataFrame(list(zip(accuracy, mse_with_rounding)), columns = ['accuracy score', 'mse (after rounding)'], index = ['train', 'test'])
+    return results
 
 #--Linear regression
+#hàm này thực hiện train và trả về kết quả đánh giá 
 def linear_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     # basic linear regression
     from sklearn.linear_model import LinearRegression
@@ -56,17 +54,26 @@ def linear_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     lm.fit(X_train_scaled, y_train)
     y_pred_train = lm.predict(X_train_scaled)
     y_pred_test = lm.predict(X_test_scaled)
-    global metrics_lr #store this for a later comparison between different methods
+    #global metrics_lr lưu giữ ở đây cho lần so sánh kế tiếp 
+    global metrics_lr 
     metrics_lr = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
     return scores_results(y_train, y_test, y_pred_train, y_pred_test)
 
-scores =linear_reg(X_train_scaled, X_test_scaled, y_train, y_test)
-print("Metric Linear regression: ")
-print(scores)
+#======================Regularization============================
+def elastic_net_reg(X_train_scaled, X_test_scaled, y_train, y_test):
+    from sklearn.linear_model import ElasticNetCV
+    #n_alphas (int) số lượng số alphas trong quá trình regularization, được sử dụng cho mỗi l1_ratio
+    n_alphas = 300
+    #float between 0 and 1 passed to ElasticNet (scaling between l1 and l2 penalties)
+    l1_ratio = [.1, .3, .5, .7, .9]
+    #cv: chỉ định số lượng k-folds
+    rr = ElasticNetCV(n_alphas=n_alphas, l1_ratio=l1_ratio, cv=10, random_state=0)
+    rr.fit(X_train_scaled, y_train)
+    y_pred_train = rr.predict(X_train_scaled)
+    y_pred_test = rr.predict(X_test_scaled)
+    metrics_en = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
+    return metrics_en
 
-#Adding regularisation
-# to avoid overfitting
-#3 different popular regularisation methods: Lasso (L1), Ridge (L2) and Elastic Net (L1 and L2).
 def lasso_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     from sklearn.linear_model import LassoCV
     n_alphas = 5000
@@ -77,16 +84,7 @@ def lasso_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     y_pred_test = lr.predict(X_test_scaled)
     metrics_lasso = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
     return metrics_lasso
-def elastic_net_reg(X_train_scaled, X_test_scaled, y_train, y_test):
-    from sklearn.linear_model import ElasticNetCV
-    n_alphas = 300
-    l1_ratio = [.1, .3, .5, .7, .9]
-    rr = ElasticNetCV(n_alphas=n_alphas, l1_ratio=l1_ratio, cv=10, random_state=0)
-    rr.fit(X_train_scaled, y_train)
-    y_pred_train = rr.predict(X_train_scaled)
-    y_pred_test = rr.predict(X_test_scaled)
-    metrics_en = [accuracy_score(y_test, np.round(y_pred_test)), mean_squared_error(y_test, y_pred_test), r2_score(y_test, y_pred_test)]
-    return metrics_en
+
 def ridge_reg(X_train_scaled, X_test_scaled, y_train, y_test):
     from sklearn.linear_model import RidgeCV
     n_alphas = 100

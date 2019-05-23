@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>5c038eca-1c87-4b48-bc57-222d0473d916</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>elasticNetRegression.py</StartupFile>
+    <StartupFile>ElasticNetRegression.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,8 +21,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="elasticNetRegression.py" />
+    <Compile Include="DemoElasticNetRegression.py" />
+    <Compile Include="ElasticNetRegression.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="nhap.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="plot_lasso_and_elasticnet.py" />
+    <Compile Include="CompareLassoRidgeElastic.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dataset\" />
